@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body{
+     font-family: "Poppins", sans-serif;
+}
+
+/* Keep browser autofill from changing input background/text to white */
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+     -webkit-text-fill-color: #e5e7eb !important; /* neutral-200 */
+     -webkit-box-shadow: 0 0 0px 1000px #262626 inset !important; /* neutral-900 */
+     /* box-shadow: 0 0 0px 1000px rgba(15,23,42,1) inset !important; */
+     transition: background-color 5000s ease-in-out 0s !important;
+}
+
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill:focus {
+     -webkit-text-fill-color: #ffffff !important;
+     -webkit-box-shadow: 0 0 0px 1000px #262626 inset !important;
+     /* box-shadow: 0 0 0px 1000px rgba(15,23,42,1) inset !important; */
+}
+
+/* Firefox */
+input:-moz-autofill,
+textarea:-moz-autofill,
+select:-moz-autofill {
+     box-shadow: 0 0 0px 1000px rgba(15,23,42,1) inset !important;
+     -moz-text-fill-color: #e5e7eb !important;
+}
+
+/* Kanban column scrollbar */
+.kanban-scroll {
+  scrollbar-width: thin;               /* Firefox */
+  scrollbar-color: rgba(107,114,128,0.7) transparent;
+  /* direction: rtl;        puts scrollbar on left */
+  padding-right: 8px;
+  box-sizing: content-box;
+}
+.kanban-scroll > * { direction: ltr; }    /* keep inner layout normal */
+
+/* WebKit (Chrome, Edge, Safari) */
+.kanban-scroll::-webkit-scrollbar {
+     width: 5px;
+}
+.kanban-scroll::-webkit-scrollbar-track {
+     background: transparent;
+}
+.kanban-scroll::-webkit-scrollbar-thumb {
+  background: rgba(107,114,128,0.7);
+  border-radius: 8px;
+  border: 3px solid transparent; /* makes thumb appear inset */
+  background-clip: padding-box;
+}
+.kanban-scroll::-webkit-scrollbar-thumb:hover {
+     background: rgba(140,140,140,0.8);
+}
