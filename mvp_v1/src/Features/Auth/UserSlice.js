@@ -17,6 +17,7 @@ const initialState = {
   user: null,
   status: "idle", // idle | loading | success | error
   error: null,
+  isAuthenticated : false
 };
 const userSlice = createSlice({
   name: "user",
@@ -34,6 +35,7 @@ const userSlice = createSlice({
       })
       .addCase(signup.fulfilled, (state, action) => {
         state.status = "success";
+        state.isAuthenticated = true;
         state.user = action.payload;
       })
       .addCase(signup.rejected, (state, action) => {
