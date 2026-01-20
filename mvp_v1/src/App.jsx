@@ -1,13 +1,13 @@
 import Signup from "./Components/Auth/Signup";
 import Signin from "./Components/Auth/Signin";
-import { createHashRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Dashboard from "./Components/App/Myspace/Dashboard/Dashboard";
 import AppLayout from "./Components/App/AppLayout";
 import Myspace from "./Components/App/Myspace/Myspace";
 import Matrix from "./Components/App/Myspace/Matrix/Matrix";
 import ProtectedRoute from "./ProtectedRoute";
 
-const router = createHashRouter([
+const router = createBrowserRouter([
   // public routes
   { path: "/", element: <Signin /> },
   { path: "/signin", element: <Signin /> },
