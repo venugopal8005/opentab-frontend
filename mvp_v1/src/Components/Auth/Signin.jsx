@@ -5,20 +5,26 @@ import { Link } from "react-router-dom";
 // import { authStart, authFailure, authSuccess } from "@/Features/Auth/UserSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
+import { signin } from "@/Features/Auth/UserSlice";
 const Signin = () => {
-
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [email, setemail] = useState("");
+  const [password, setpassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   // const [email, setemail] = useState("");
   // const [password, setpassword] = useState("");
   const { isAuthenticated, user, status, error } = useSelector(
-    (state) => state.user
+    (state) => state.user,
   );
   const handleSignin = (e) => {
     e.preventDefault();
+    dispatch(
+      signin({
+        email: email,
+        password: password,
+      }),
+    );
     // dispatch(authStart({}));
 
     // // mock backend
@@ -65,6 +71,8 @@ const Signin = () => {
                 <div className="relative">
                   <input
                     type="email"
+                    value={email}
+                    onChange={(e) => setemail(e.target.value)}
                     placeholder="abc@gmail.com"
                     required
                     className="w-full rounded-xl bg-neutral-800 border border-neutral-700 px-4 py-3 text-sm placeholder-neutral-500 focus:outline-none focus:ring-4 focus:ring-blue-400/20 transition-shadow"
@@ -80,6 +88,8 @@ const Signin = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="Password"
+                    value={password}
+                    onChange={(e) => setpassword(e.target.value)}
                     className="w-full rounded-xl bg-neutral-800 border border-neutral-700 px-4 py-3 text-sm placeholder-neutral-500 focus:outline-none focus:ring-4 focus:ring-blue-400/20 transition-shadow"
                   />
                   <button

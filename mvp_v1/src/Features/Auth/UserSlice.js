@@ -13,6 +13,18 @@ export const signup = createAsyncThunk(
     }
   }
 );
+export const signin = createAsyncThunk(
+  "user/signin",
+  async (formData, { rejectWithValue }) => {
+    try {
+      console.log(formData);
+      const res = await api.post("/auth/login", formData);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Signin failed");
+    }
+  }
+)
 const initialState = {
   user: null,
   status: "idle", // idle | loading | success | error
@@ -39,6 +51,19 @@ const userSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(signup.rejected, (state, action) => {
+        state.status = "error";
+        state.error = action.payload;
+      })
+      .addCase(signin.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(signin.fulfilled, (state, action) => {
+        state.status = "success";
+        state.isAuthenticated = true;
+        state.user = action.payload;
+      })
+      .addCase(signin.rejected, (state, action) => {
         state.status = "error";
         state.error = action.payload;
       });
