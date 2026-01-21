@@ -9,11 +9,11 @@ export default function ProtectedRoute({ children }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => setIsLoading(false), 3000);
+    setTimeout(() => setIsLoading(false), 2000);
   }, []);
 
   // 🔒 HOLD THE LINE until auth resolves
-  if (status === "loading") {
+  if (isLoading || status === "loading") {
     return <div className="h-[100svh] w-full bg-[#070709] flex justify-center items-center"><span class="loader"></span></div>; // spinner later
  
   }
