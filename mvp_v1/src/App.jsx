@@ -6,6 +6,9 @@ import AppLayout from "./Components/App/AppLayout";
 import Myspace from "./Components/App/Myspace/Myspace";
 import Matrix from "./Components/App/Myspace/Matrix/Matrix";
 import ProtectedRoute from "./ProtectedRoute";
+import { useEffect } from "react";
+import { checkAuth } from "./Features/Auth/authThunks";
+import { useDispatch } from "react-redux";
 
 const router = createBrowserRouter([
   // public routes
@@ -28,7 +31,7 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <Dashboard /> },
           { path: "dashboard", element: <Dashboard /> },
-          { path: "matrix" , element:<Matrix/>}
+          { path: "matrix", element: <Matrix /> },
           // { path: "personality", element: <PersonalityMatrix /> },
         ],
       },
@@ -37,5 +40,10 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
   return <RouterProvider router={router} />;
 }

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api/axios";
 
+export const auth = createAsyncThunk();
 export const signup = createAsyncThunk(
   "user/signup",
   async (formData, { rejectWithValue }) => {
@@ -11,7 +12,7 @@ export const signup = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Signup failed");
     }
-  }
+  },
 );
 export const signin = createAsyncThunk(
   "user/signin",
@@ -23,13 +24,13 @@ export const signin = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Signin failed");
     }
-  }
-)
+  },
+);
 const initialState = {
   user: null,
   status: "idle", // idle | loading | success | error
   error: null,
-  isAuthenticated : false
+  isAuthenticated: false,
 };
 const userSlice = createSlice({
   name: "user",
@@ -38,7 +39,25 @@ const userSlice = createSlice({
     clearError(state) {
       state.error = null;
     },
+
+    authStart(state) {
+      state.status = "loading";
+    },
+
+    authSuccess(state, action) {
+      state.status = "success";
+      state.isAuthenticated = true;
+      state.user = action.payload;
+      state.error = null;
+    },
+
+    authLogout(state) {
+      state.status = "error";
+      state.isAuthenticated = false;
+      state.user = null;
+    },
   },
+
   extraReducers: (builder) => {
     builder
       .addCase(signup.pending, (state) => {
@@ -69,6 +88,7 @@ const userSlice = createSlice({
       });
   },
 });
+export const { clearError, authStart, authSuccess, authLogout } =
+  userSlice.actions;
 
-export const { clearError } = userSlice.actions;
 export default userSlice.reducer;
