@@ -3,7 +3,7 @@ import MyDeskSidebar from "./MyDeskSidebar";
 
 const Myspace = () => {
   return (
-    <div className="flex h-full gap-2">
+    <div className="flex h-full gap-2 ">
       {/* Local sidebar that stays */}
       <MyDeskSidebar />
 

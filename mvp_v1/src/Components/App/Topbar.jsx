@@ -13,7 +13,7 @@ const Topbar = () => {
   const title = getSectionTitle(pathname);
 
   return (
-    <div className="h-12 pl-9 pr-5 flex items-center justify-between bg-[#000000] text-white">
+    <div className="h-12 pl-9 pr-5 flex items-center justify-between  text-white">
       {/* Section title */}
       <span className="text-xl font-Medium">{title}</span>
 <p className="text-2xl">Opentab</p>

@@ -8,13 +8,16 @@ import {
 } from "@/Features/Myspace/Dashboard/Kanban/taskSlice"; //case reducer
 // import AddTaskComposer from "./AddTaskComposer";
 import AddTaskOverlay from "./AddTaskOverlay";
+import {formatDateShort} from "../../../utils/date.js"
 
 const KanbanBoard = () => {
   const tasks = useSelector((state) => state.tasks.items);
   const [showAddTask, setShowAddTask] = useState(false);
+  // const [dueDate, setDueDate] = useState("");
+  
 
   return (
-    <div className="h-full gap-3 w-[70%] rounded-xl text-white relative flex">
+    <div className="max-h-full h-full gap-3 w-[70%] rounded-xl text-white  relative flex">
       <KanbanColumn
         title="To-Do"
         status="todo"
@@ -48,7 +51,7 @@ const KanbanColumn = ({ title, color, status, tasks, onAddTask }) => {
       </div>
 
       {/* Tasks */}
-      <div className="flex flex-col gap-2 flex-1 overfLow-y-auto">
+      <div className="flex flex-col gap-2 flex-1 max-h-[82svh] overflow-y-auto kanban-scroll ">
         {columnTasks.map((task) => (
           <TaskCard key={task.id} task={task} />
         ))}
@@ -103,7 +106,7 @@ const TaskCard = ({ task }) => {
       toggleSubtask({
         taskId: task.id,
         subtaskId,
-      })
+      }),
     );
   };
   const handleDeleteTask = (taskId) => {
@@ -184,7 +187,7 @@ const TaskCard = ({ task }) => {
               stroke-linejoin="round"
             />
           </svg>
-          {task.dueDate /* renamed to camelCase `dueDate` */}
+          {formatDateShort(task.dueDate) /* renamed to camelCase `dueDate` */}
         </span>
       </div>
 
@@ -219,40 +222,38 @@ const TaskCard = ({ task }) => {
       {/* Priority */}
       <div className="flex gap-2 pt-2 relative ">
         <span className={priorityClassMap[task.priority]}>{task.priority}</span>
-        {expanded && (<>
-          <div className="flex gap-2 right-0 absolute mr-10  ">
-            {task.status != "todo" && (
-              <span
-                className="px-2 py-1  rounded-lg border border-[#818656] text-xs bg-[#515625] text-[#cad46e] w-fit cursor-pointer"
-                onClick={() => changeStatus("todo")}
-              >
-                To-Do
-              </span>
-            )}
+        {expanded && (
+          <>
+            <div className="flex gap-2 right-0 absolute mr-10  ">
+              {task.status != "todo" && (
+                <span
+                  className="px-2 py-1  rounded-lg border border-[#818656] text-xs bg-[#515625] text-[#cad46e] w-fit cursor-pointer"
+                  onClick={() => changeStatus("todo")}
+                >
+                  To-Do
+                </span>
+              )}
 
-            {task.status != "doing" && (
-              <span
-                onClick={() => changeStatus("doing")}
-                className="px-2 py-1  rounded-lg border border-[#4c2950] text-xs bg-[#110812] text-[#ab7bb0] w-fit cursor-pointer"
-              >
-                Doing
-              </span>
-            )}
-            {task.status != "done" && (
-              <span className={LowPill} onClick={() => changeStatus("done")}>
-                Done
-              </span>
-            )}
-
-          
-          </div>
+              {task.status != "doing" && (
+                <span
+                  onClick={() => changeStatus("doing")}
+                  className="px-2 py-1  rounded-lg border border-[#4c2950] text-xs bg-[#110812] text-[#ab7bb0] w-fit cursor-pointer"
+                >
+                  Doing
+                </span>
+              )}
+              {task.status != "done" && (
+                <span className={LowPill} onClick={() => changeStatus("done")}>
+                  Done
+                </span>
+              )}
+            </div>
             <svg
               width="24"
               height="24"
               viewBox="0 0 24 24"
               fill="none"
               className="absolute right-0 bottom-0 w-5 h-5 text-gray-400 hover:text-blue-600"
-              
             >
               <path
                 d="M10.0002 4H7.2002C6.08009 4 5.51962 4 5.0918 4.21799C4.71547 4.40973 4.40973 4.71547 4.21799 5.0918C4 5.51962 4 6.08009 4 7.2002V16.8002C4 17.9203 4 18.4801 4.21799 18.9079C4.40973 19.2842 4.71547 19.5905 5.0918 19.7822C5.5192 20 6.07899 20 7.19691 20H16.8031C17.921 20 18.48 20 18.9074 19.7822C19.2837 19.5905 19.5905 19.2839 19.7822 18.9076C20 18.4802 20 17.921 20 16.8031V14M16 5L10 11V14H13L19 8M16 5L19 2L22 5L19 8M16 5L19 8"
@@ -261,7 +262,8 @@ const TaskCard = ({ task }) => {
                 stroke-linecap="round"
                 stroke-linejoin="round"
               />
-            </svg></>
+            </svg>
+          </>
         )}
       </div>
     </div>

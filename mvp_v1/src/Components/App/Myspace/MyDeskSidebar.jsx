@@ -16,7 +16,7 @@ const Item = ({ to, label }) => {
 
 const MyDeskSidebar = () => {
   return (
-    <div className="w-72 h-full rounded-xl bg-[#070709] p-4 flex flex-col gap-6 border-[#29292D] border">
+    <div className="w-72 h-full h-max-[90svh] rounded-xl bg-[#070709] p-4 flex flex-col gap-6 border-[#29292D] border">
       {/* Header */}
       {/* <div className="text-sm font-semibold">MyDesk</div> */}
 

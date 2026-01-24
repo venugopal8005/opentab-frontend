@@ -2,45 +2,68 @@ import { useEffect, useState } from "react";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { addTask } from "@/Features/Myspace/Dashboard/Kanban/taskSlice";
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar } from "@/Pre-components/ui/calendar";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/Pre-components/ui/select";
+import { createTask } from "@/Features/Myspace/Dashboard/Kanban/taskThunk";
 
 const AddTaskOverlay = ({ onClose }) => {
   const [calenderclick, setclanderclick] = useState(false);
 
   const dispatch = useDispatch();
   const [date, setDate] = useState(new Date());
-  const [dueDate, setDueDate] = useState(""); // use camelCase `dueDate`
-  const [title, setTitle] = useState("");
+  // use camelCase `dueDate`
+  const [title, setTitle] = useState(""); // "title"
   const [priority, setPriority] = useState("Medium");
   const [subtasks, setSubtasks] = useState("");
-  useEffect(() => {
-    setDueDate(
-      new Date(date)
-        .toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        })
-        .replace(/ /g, "-")
-    ); // update camelCase `dueDate` when `date` changes
-  }, [date]);
+  const displayDate = date
+    ? date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : "";
+  const isoDueDate = date
+    ? date.toISOString().split("T")[0] // YYYY-MM-DD
+    : null;
+
+  // const [dueDate, setDueDate] = useState("");
+
+  // useEffect(() => {
+  //   setDueDate(
+  //     new Date(date)
+  //       .toLocaleDateString("en-GB", {
+  //         day: "2-digit",
+  //         month: "short",
+  //         year: "numeric",
+  //       })
+  //       .replace(/ /g, "-")
+
+  //   ); // update camelCase `dueDate` when `date` changes
+  // }, [date]);
   const handleSubmit = () => {
     if (!title.trim()) return;
 
+    let dueDateISO = null;
+
+    if (date) {
+      const localMidnight = new Date(date);
+      localMidnight.setHours(0, 0, 0, 0); // 🔒 critical line
+      dueDateISO = localMidnight.toISOString();
+    }
+
     dispatch(
-      addTask({
+      createTask({
         title,
         priority,
         subtasks: subtasks ? subtasks.split(",").map((s) => s.trim()) : [],
-        dueDate, // include camelCase `dueDate` in payload
-      })
+        dueDate: dueDateISO,
+      }),
     );
 
     onClose();
@@ -50,14 +73,17 @@ const AddTaskOverlay = ({ onClose }) => {
   console.log(date);
   return (
     <div className="absolute inset-0 z-50 bg-[#0000007b]  flex items-center justify-center">
-      <div className="w-[500px] rounded-xl bg-[#131416] relative p-6 flex flex-col gap-3" onKeyDown={(e)=>{
-            if (e.key === "Enter") {
-              handleSubmit();
-            }
-            if (e.key === "Escape") {
-              onClose();
-            }
-          }}>
+      <div
+        className="w-[500px] rounded-xl bg-[#131416] relative p-6 flex flex-col gap-3"
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            handleSubmit();
+          }
+          if (e.key === "Escape") {
+            onClose();
+          }
+        }}
+      >
         <h3 className="text-lg font-Medium">New Task</h3>
         <input
           autoFocus
@@ -65,13 +91,12 @@ const AddTaskOverlay = ({ onClose }) => {
           placeholder="Task title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          
         />
         <div className="flex w-full gap-2">
           <div className=" border p-1 rounded-xl flex-2 flex items-center border-[#2c2c31] text-lg outline-none w-full">
             <input
               type="text"
-              value={dueDate} // use camelCase `dueDate` for binding
+              value={displayDate} // use camelCase `dueDate` for binding
               className=" bg-transparent flex flex-1 w-32 px-1 text-sm focus:outline-none focus:border-none focus:ring-0 "
               placeholder="Due Date - DD/MM/YYYY"
             />
@@ -99,6 +124,7 @@ const AddTaskOverlay = ({ onClose }) => {
               selected={date}
               onSelect={(selectedDate) => {
                 setDate(selectedDate);
+
                 setclanderclick(false);
               }}
               className="rounded-lg bg-[#131416] z-20 scale-[0.8] border-[#3c3b3b] border absolute top-[150px] left-32"
