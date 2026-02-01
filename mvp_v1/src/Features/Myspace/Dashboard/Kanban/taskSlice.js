@@ -20,8 +20,8 @@ const tasksSlice = createSlice({
     },
 
     updateTask(state, action) {
-      const { id, updates } = action.payload;
-      const task = state.items.find((t) => t._id === id);
+      const { _id, updates } = action.payload;
+      const task = state.items.find((t) => t._id === _id);
       if (task) {
         Object.assign(task, updates);
       }
@@ -48,14 +48,15 @@ const tasksSlice = createSlice({
     // --------------------
 
     toggleSubtask(state, action) {
-      const { taskId, subtaskId } = action.payload;
-      const task = state.items.find((t) => t._id === taskId);
-      if (task) {
-        const subtask = task.subtasks.find((s) => s._id === subtaskId);
-        if (subtask) {
-          subtask.done = !subtask.done;
-        }
-      }
+      const { taskId: taskMongoId, subtaskId } = action.payload;
+
+      const task = state.items.find((t) => t._id === taskMongoId);
+      if (!task?.subtasks) return;
+
+      const subtask = task.subtasks.find((s) => s._id === subtaskId);
+      if (!subtask) return;
+
+      subtask.done = !subtask.done;
     },
 
     deleteSubtask(state, action) {
@@ -76,7 +77,7 @@ export const {
   setCurrentTask,
   toggleSubtask,
   deleteSubtask,
-  setTasks
+  setTasks,
 } = tasksSlice.actions;
 
 export default tasksSlice.reducer;

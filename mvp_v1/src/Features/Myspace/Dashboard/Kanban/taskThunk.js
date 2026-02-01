@@ -1,6 +1,7 @@
 import api from "@/api/axios";
 import { setTasks } from "./taskSlice";
 import { addTask } from "./taskSlice";
+import { toggleSubtask } from "./taskSlice";
 
 export const fetchTasks = () => async (dispatch) => {
   try {
@@ -29,3 +30,35 @@ export const createTask = (taskData) => async (dispatch) => {
     console.error("Failed to create task", err);
   }
 };
+
+export const updateTask = (taskData) => async (dispatch) =>{
+  try{
+    console.log("task is updating...");
+    const res = await api.post("/tasks/update-task", taskData, {
+      withCredentials: true,
+    });
+  
+
+  }catch(err){
+    console.error("Failed to update task", err);
+
+  }
+}
+export const toggleSubtaskServer =
+  ({ taskId, subtaskId, done }) =>
+  async (dispatch) => {
+    try {
+      await api.patch(
+        `/tasks/${taskId}/subtasks/${subtaskId}`,
+        { done }
+      );
+    } catch (error) {
+      // rollback if backend fails
+      dispatch(
+        toggleSubtask({
+          taskId,
+          subtaskId,
+        })
+      );
+    }
+  };

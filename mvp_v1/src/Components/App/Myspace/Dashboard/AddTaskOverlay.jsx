@@ -10,17 +10,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Pre-components/ui/select";
-import { createTask } from "@/Features/Myspace/Dashboard/Kanban/taskThunk";
+import {
+  createTask,
+  updateTask,
+} from "@/Features/Myspace/Dashboard/Kanban/taskThunk";
 
-const AddTaskOverlay = ({ onClose }) => {
+
+const AddTaskOverlay = ({ onClose, Edittask }) => {
   const [calenderclick, setclanderclick] = useState(false);
-
+  const task = Edittask;
   const dispatch = useDispatch();
-  const [date, setDate] = useState(new Date());
-  // use camelCase `dueDate`
-  const [title, setTitle] = useState(""); // "title"
+  const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("Medium");
   const [subtasks, setSubtasks] = useState("");
+  const [date, setDate] = useState(new Date());
+  const [status, setstatus] = useState("todo");
+  useEffect(() => {
+    if (task) {
+      setTitle(task.title || "");
+      setPriority(task.priority || "Medium");
+      setstatus(task.status || "todo");
+      setSubtasks(task.subtasks?.map((s) => s.title).join(", ") || "");
+      setDate(task.dueDate ? new Date(task.dueDate) : null);
+    }
+  }, [task]);
+
   const displayDate = date
     ? date.toLocaleDateString("en-GB", {
         day: "2-digit",
@@ -31,21 +45,6 @@ const AddTaskOverlay = ({ onClose }) => {
   const isoDueDate = date
     ? date.toISOString().split("T")[0] // YYYY-MM-DD
     : null;
-
-  // const [dueDate, setDueDate] = useState("");
-
-  // useEffect(() => {
-  //   setDueDate(
-  //     new Date(date)
-  //       .toLocaleDateString("en-GB", {
-  //         day: "2-digit",
-  //         month: "short",
-  //         year: "numeric",
-  //       })
-  //       .replace(/ /g, "-")
-
-  //   ); // update camelCase `dueDate` when `date` changes
-  // }, [date]);
   const handleSubmit = () => {
     if (!title.trim()) return;
 
@@ -69,6 +68,42 @@ const AddTaskOverlay = ({ onClose }) => {
     onClose();
   };
 
+  //updating task
+  const handleEdit = () => {
+    if (!title.trim()) return;
+    let dueDateISO = null;
+
+    if (date) {
+      const localMidnight = new Date(date);
+      localMidnight.setHours(0, 0, 0, 0); // 🔒 critical line
+      dueDateISO = localMidnight.toISOString();
+    }
+
+    dispatch(
+      updateTask({
+        title,
+        priority,
+        subtasks: subtasks ? subtasks.split(",").map((s) => s.trim()) : [],
+        dueDate: dueDateISO,
+        status,
+        taskID : Edittask._id
+      }),
+    );
+    // console.log(
+    //   "title:",
+    //   title,
+    //   "priority:",
+    //   priority,
+    //   "status:",
+    //   status,
+    //   "subtasks:",
+    //   subtasks ? subtasks.split(",").map((s) => s.trim()) : [],
+    //   "Duedate:",
+    //   dueDateISO,
+    // );
+    onClose();
+  };
+
   console.log(calenderclick);
   console.log(date);
   return (
@@ -84,7 +119,41 @@ const AddTaskOverlay = ({ onClose }) => {
           }
         }}
       >
-        <h3 className="text-lg font-Medium">New Task</h3>
+        <div className=" w-full flex justify-between items-center">
+          <h3 className="text-lg font-Medium">
+            {" "}
+            {Edittask ? "Edit Task" : "New Task"}
+          </h3>
+          {Edittask && (
+            <Select value={status} onValueChange={setstatus}>
+              <SelectTrigger className="w-[25%] bg-transparent py-2 border-[#2c2c31] text-sm text-gray-300 rounded-xl">
+                <SelectValue placeholder="Priority" />
+              </SelectTrigger>
+
+              <SelectContent className=" border-[#2c2c31] bg-[#131416] ">
+                <SelectItem
+                  value="done"
+                  className="px-2 py-1 m-2 rounded-lg border border-[#2e5e3d] text-xs bg-[#172D1E] text-[#6ab381] w-20 cursor-pointer"
+                >
+                  <span>Done</span>
+                </SelectItem>
+                <SelectItem
+                  value="doing"
+                  className="px-2 py-1 m-2 rounded-lg border border-[#854c30] text-xs bg-[#322017] text-[#d4a791] w-20 cursor-pointer"
+                >
+                  Doing
+                </SelectItem>
+                <SelectItem
+                  value="todo"
+                  className="px-2 py-0.5 m-2 rounded-lg border border-[#4C141C] text-xs bg-[#31171B] text-red-400 w-20 cursor-pointer"
+                >
+                  To-Do
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        </div>
+
         <input
           autoFocus
           className="bg-transparent border  p-2 rounded-xl   border-[#2c2c31] text-lg outline-none w-full"
@@ -130,25 +199,7 @@ const AddTaskOverlay = ({ onClose }) => {
               className="rounded-lg bg-[#131416] z-20 scale-[0.8] border-[#3c3b3b] border absolute top-[150px] left-32"
             />
           )}
-          {/* 
-          <select
-            className="bg-transparent text-xs w-[40%] border rounded-xl  border-[#2c2c31] p-2  text-gray-300"
-            value={priority}
-            onChange={(e) => setPriority(e.target.value)}
-          >
-            <option value="Low" className="bg-black rounded-sm">
-              Low
-            </option>
-            <option value="Medium" className="bg-black">
-              Medium
-            </option>
-            <option
-              value="High"
-              className="px-2 py-0.5 rounded-lg border border-[#4C141C] text-xs bg-[#31171B] text-red-400"
-            >
-              High
-            </option>
-          </select> */}
+
           <Select value={priority} onValueChange={setPriority}>
             <SelectTrigger className="w-[40%] bg-transparent py-6 border-[#2c2c31] text-sm text-gray-300 rounded-xl">
               <SelectValue placeholder="Priority" />
@@ -196,7 +247,7 @@ const AddTaskOverlay = ({ onClose }) => {
           </svg>
 
           <input
-            className="bg-transparent  flex-1 p-1 border-[#2c2c31] text-sm outline-none"
+            className="bg-transparent  flex-1 p-1 border-[#2c2c31] text-sm outline-none "
             placeholder="To-Do"
             value={subtasks}
             onChange={(e) => setSubtasks(e.target.value)}
@@ -211,10 +262,10 @@ const AddTaskOverlay = ({ onClose }) => {
             Cancel
           </button>
           <button
-            onClick={handleSubmit}
+            onClick={Edittask ? handleEdit : handleSubmit}
             className="px-3 py-3  flex-1 rounded-lg bg-[#2F76ED] text-sm text-white"
           >
-            Add Task
+            {Edittask ? "Update Task" : "Add Task"}
           </button>
         </div>
       </div>

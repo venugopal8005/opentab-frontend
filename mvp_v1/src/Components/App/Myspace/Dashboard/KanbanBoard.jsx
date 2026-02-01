@@ -8,13 +8,15 @@ import {
 } from "@/Features/Myspace/Dashboard/Kanban/taskSlice"; //case reducer
 // import AddTaskComposer from "./AddTaskComposer";
 import AddTaskOverlay from "./AddTaskOverlay";
-import {formatDateShort} from "../../../utils/date.js"
-
+import { formatDateShort } from "../../../utils/date.js";
+import { UserStar } from "lucide-react";
+import { toggleSubtaskServer } from "@/Features/Myspace/Dashboard/Kanban/taskThunk";
 const KanbanBoard = () => {
   const tasks = useSelector((state) => state.tasks.items);
   const [showAddTask, setShowAddTask] = useState(false);
+  const [Edittask, setEdittask] = useState(null);
+  console.log(Edittask);
   // const [dueDate, setDueDate] = useState("");
-  
 
   return (
     <div className="max-h-full h-full gap-3 w-[70%] rounded-xl text-white  relative flex">
@@ -24,19 +26,42 @@ const KanbanBoard = () => {
         tasks={tasks}
         color="#0E0A12"
         onAddTask={() => setShowAddTask(true)}
+        setEdittask={setEdittask}
       />
       <KanbanColumn
         title="Doing"
         status="doing"
         tasks={tasks}
         color="#100A12"
+        setEdittask={setEdittask}
       />
-      <KanbanColumn title="Done" status="done" tasks={tasks} color="#0B110F" />
-      {showAddTask && <AddTaskOverlay onClose={() => setShowAddTask(false)} />}
+      <KanbanColumn
+        title="Done"
+        status="done"
+        tasks={tasks}
+        color="#0B110F"
+        setEdittask={setEdittask}
+      />
+      {(showAddTask || Edittask) && (
+        <AddTaskOverlay
+          onClose={() => {
+            setShowAddTask(false);
+            setEdittask(null);
+          }}
+          Edittask={Edittask}
+        />
+      )}
     </div>
   );
 };
-const KanbanColumn = ({ title, color, status, tasks, onAddTask }) => {
+const KanbanColumn = ({
+  title,
+  color,
+  status,
+  tasks,
+  onAddTask,
+  setEdittask,
+}) => {
   const columnTasks = tasks.filter((task) => task.status === status);
 
   return (
@@ -53,7 +78,7 @@ const KanbanColumn = ({ title, color, status, tasks, onAddTask }) => {
       {/* Tasks */}
       <div className="flex flex-col gap-2 flex-1 max-h-[82svh] overflow-y-auto kanban-scroll ">
         {columnTasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard key={task.id} task={task} setEdittask={setEdittask} />
         ))}
         {status === "todo" && (
           <button
@@ -78,7 +103,7 @@ const KanbanColumn = ({ title, color, status, tasks, onAddTask }) => {
   );
 };
 
-const TaskCard = ({ task }) => {
+const TaskCard = ({ task, setEdittask }) => {
   // const tasks = useSelector((state) => state.tasks.items);
 
   const [expanded, setExpanded] = useState(false);
@@ -101,14 +126,25 @@ const TaskCard = ({ task }) => {
     High: HighPill,
   };
 
-  const handleToggleSubtask = (subtaskId) => {
+  const handleToggleSubtask = (subtaskId, currentDone) => {
+    // 1. optimistic UI
     dispatch(
       toggleSubtask({
-        taskId: task.id,
+        taskId: task._id,
         subtaskId,
       }),
     );
+
+    // 2. backend sync
+    dispatch(
+      toggleSubtaskServer({
+        taskId: task._id,
+        subtaskId,
+        done: !currentDone,
+      }),
+    );
   };
+
   const handleDeleteTask = (taskId) => {
     dispatch(deleteTask(taskId));
   };
@@ -203,7 +239,7 @@ const TaskCard = ({ task }) => {
               <input
                 type="checkbox"
                 checked={subtask.done}
-                onChange={() => handleToggleSubtask(subtask.id)}
+                onChange={() => handleToggleSubtask(subtask._id,subtask.done)}
                 onClick={(e) => e.stopPropagation()}
                 // readOnly
 
@@ -254,6 +290,10 @@ const TaskCard = ({ task }) => {
               viewBox="0 0 24 24"
               fill="none"
               className="absolute right-0 bottom-0 w-5 h-5 text-gray-400 hover:text-blue-600"
+              onClick={(e) => {
+                e.stopPropagation();
+                setEdittask(task);
+              }}
             >
               <path
                 d="M10.0002 4H7.2002C6.08009 4 5.51962 4 5.0918 4.21799C4.71547 4.40973 4.40973 4.71547 4.21799 5.0918C4 5.51962 4 6.08009 4 7.2002V16.8002C4 17.9203 4 18.4801 4.21799 18.9079C4.40973 19.2842 4.71547 19.5905 5.0918 19.7822C5.5192 20 6.07899 20 7.19691 20H16.8031C17.921 20 18.48 20 18.9074 19.7822C19.2837 19.5905 19.5905 19.2839 19.7822 18.9076C20 18.4802 20 17.921 20 16.8031V14M16 5L10 11V14H13L19 8M16 5L19 2L22 5L19 8M16 5L19 8"

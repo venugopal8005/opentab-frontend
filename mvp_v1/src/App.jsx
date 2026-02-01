@@ -14,8 +14,8 @@ const router = createBrowserRouter([
   // public routes
   { path: "/", element: <Signin /> },
   { path: "/signin", element: <Signin /> },
-  { path: "/signup", element: <Signup /> },
 
+  { path: "/signup", element: <Signup /> },
   // protected app routes
   {
     path: "/app",
@@ -32,7 +32,6 @@ const router = createBrowserRouter([
           { index: true, element: <Dashboard /> },
           { path: "dashboard", element: <Dashboard /> },
           { path: "matrix", element: <Matrix /> },
-          // { path: "personality", element: <PersonalityMatrix /> },
         ],
       },
     ],
