@@ -15,7 +15,7 @@ const KanbanBoard = () => {
   const tasks = useSelector((state) => state.tasks.items);
   const [showAddTask, setShowAddTask] = useState(false);
   const [Edittask, setEdittask] = useState(null);
-  console.log(Edittask);
+  // console.log(Edittask);
   // const [dueDate, setDueDate] = useState("");
 
   return (
@@ -78,7 +78,7 @@ const KanbanColumn = ({
       {/* Tasks */}
       <div className="flex flex-col gap-2 flex-1 max-h-[82svh] overflow-y-auto kanban-scroll ">
         {columnTasks.map((task) => (
-          <TaskCard key={task.id} task={task} setEdittask={setEdittask} />
+          <TaskCard key={task._id} task={task} setEdittask={setEdittask} />
         ))}
         {status === "todo" && (
           <button
@@ -109,7 +109,7 @@ const TaskCard = ({ task, setEdittask }) => {
   const [expanded, setExpanded] = useState(false);
   const dispatch = useDispatch();
   const changeStatus = (status) => {
-    dispatch(moveTask({ id: task.id, status }));
+    dispatch(moveTask({ id: task._id, status }));
   };
 
   const completed = task.subtasks.filter((s) => s.done).length;
@@ -169,7 +169,7 @@ const TaskCard = ({ task, setEdittask }) => {
               viewBox="0 0 24 24"
               fill="none"
               className="w-5 h-5 text-gray-400 hover:text-red-500"
-              onClick={() => handleDeleteTask(task.id)}
+              onClick={() => handleDeleteTask(task._id)}
             >
               <path
                 d="M14 10V17M10 10V17M6 6V17.8C6 18.9201 6 19.4798 6.21799 19.9076C6.40973 20.2839 6.71547 20.5905 7.0918 20.7822C7.5192 21 8.07899 21 9.19691 21H14.8031C15.921 21 16.48 21 16.9074 20.7822C17.2837 20.5905 17.5905 20.2839 17.7822 19.9076C18 19.4802 18 18.921 18 17.8031V6M6 6H8M6 6H4M8 6H16M8 6C8 5.06812 8 4.60241 8.15224 4.23486C8.35523 3.74481 8.74432 3.35523 9.23438 3.15224C9.60192 3 10.0681 3 11 3H13C13.9319 3 14.3978 3 14.7654 3.15224C15.2554 3.35523 15.6447 3.74481 15.8477 4.23486C15.9999 4.6024 16 5.06812 16 6M16 6H18M18 6H20"
@@ -232,7 +232,7 @@ const TaskCard = ({ task, setEdittask }) => {
         <div className="flex flex-col gap-2 pt-2">
           {task.subtasks.map((subtask) => (
             <label
-              key={subtask.id}
+              key={subtask._id}
               className="flex items-center gap-2 text-xs text-gray-300"
               onClick={(e) => e.stopPropagation()}
             >
