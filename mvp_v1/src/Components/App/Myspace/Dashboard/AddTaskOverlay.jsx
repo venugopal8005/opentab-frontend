@@ -112,7 +112,8 @@ const AddTaskOverlay = ({ onClose, Edittask }) => {
         className="w-[500px] rounded-xl bg-[#131416] relative p-6 flex flex-col gap-3"
         onKeyDown={(e) => {
           if (e.key === "Enter") {
-            handleSubmit();
+            Edittask?handleEdit():handleSubmit();
+            
           }
           if (e.key === "Escape") {
             onClose();
